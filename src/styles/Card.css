@@ -1,0 +1,35 @@
+/* Always show arrows */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 60px;
+  opacity: 1;
+}
+
+/* Arrow icon styling */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: #000; /* black circle */
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  background-size: 60%;
+}
+
+/* Position arrows outside cards */
+.carousel-control-prev {
+  left: -70px;
+}
+
+.carousel-control-next {
+  right: -70px;
+}
+
+/* Mobile adjustment */
+@media (max-width: 768px) {
+  .carousel-control-prev {
+    left: 10px;
+  }
+  .carousel-control-next {
+    right: 10px;
+  }
+}

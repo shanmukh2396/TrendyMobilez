@@ -1,0 +1,271 @@
+/* ================ VARIABLES ================ */
+:root {
+  --green-main: skyblue;
+  --green-dark: #1e4728;
+  --gold: #e2b614;
+  --white: #ffffff;
+  --light-text: #e8f5e9;
+  --text-dark: #333333;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+/* ================ RESET & BASE ================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background-color: #f9fafb;
+  color: var(--text-dark);
+}
+
+/* ================ HEADER ================ */
+header {
+  background: var(--green-main);
+  color: var(--white);
+  padding: 1rem 0;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-container {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+/* ================ LOGO ================ */
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.logo-icon {
+  font-size: 4.8rem;
+  color: var(--gold);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-name {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--white);
+}
+
+.tagline {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--light-text);
+}
+
+/* ================ NAVIGATION ================ */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: var(--white);
+  text-decoration: none;
+  font-size: 1.8rem;
+  font-weight: 500;
+  transition: color 0.25s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active:hover {
+  color: var(--gold);
+}
+
+.nav-links .active {
+  color: var(--white);
+  font-weight: 600;
+}
+
+/* ================ SEARCH FORM ================ */
+.nav-links form.d-flex {
+  display: flex;
+  align-items: center;
+}
+
+.form-control {
+  padding: 0.6rem 1rem;
+  font-size: 1.4rem;
+  border-radius: 6px 0 0 6px;
+  border: none;
+  min-width: 220px;
+}
+
+.btn-primary {
+  padding: 0.6rem 1.4rem;
+  font-size: 1.4rem;
+  border-radius: 0 6px 6px 0;
+  background-color: var(--gold);
+  border: none;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background-color: #d4a017;
+}
+
+/* ================ DROPDOWN ================ */
+.nav-item.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+/* Default hidden state */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  min-width: 180px;
+  padding: 0.6rem 0;
+  margin: 0.125rem 0 0;
+  font-size: 1.4rem;
+  color: var(--text-dark);
+  text-align: left;
+  list-style: none;
+  background-color: #ffffff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+/* Shown state (controlled by .show class) */
+.dropdown-menu.show {
+  display: block;
+}
+
+/* Dropdown items */
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 1.4rem;
+  clear: both;
+  font-weight: 400;
+  color: var(--text-dark);
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #f0f4ff;
+  color: #000;
+}
+
+/* Optional: little arrow above dropdown */
+.dropdown-menu::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 20px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #fff;
+}
+
+/* ================ RESPONSIVE DESIGN ================ */
+
+/* Large tablets & smaller desktops */
+@media (max-width: 992px) {
+  .header-container {
+    flex-direction: column;
+    padding: 1.5rem 20px;
+    text-align: center;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem 2.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .logo-icon {
+    font-size: 3.5rem;
+  }
+
+  .mobile-name {
+    font-size: 2.1rem;
+  }
+
+  .tagline {
+    font-size: 1.3rem;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 600px) {
+  .logo-icon {
+    font-size: 2.8rem;
+  }
+
+  .mobile-name {
+    font-size: 1.9rem;
+  }
+
+  .tagline {
+    font-size: 1.1rem;
+  }
+
+  .nav-links {
+    gap: 1.2rem 1.8rem;
+  }
+
+  .nav-links a {
+    font-size: 1.6rem;
+  }
+
+  .form-control {
+    min-width: 160px;
+    font-size: 1.3rem;
+  }
+
+  .btn-primary {
+    font-size: 1.3rem;
+    padding: 0.55rem 1.2rem;
+  }
+
+  .dropdown-menu {
+    min-width: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
