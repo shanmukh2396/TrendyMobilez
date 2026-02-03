@@ -1,5 +1,5 @@
 // src/App.jsx
-import { Routes, Route } from "react-router-dom";
+import { ProtectedRoute, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Carousel from "./components/Carousel";
 import Card from "./components/Card"; // your product list page
