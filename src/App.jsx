@@ -8,7 +8,9 @@ import About from "./components/About";
 import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
-
+import Profile from "./components/Profile";
+import Cart from "./components/Cart";
+import MyOrders from "./components/MyOrders";
 // Import all individual product pages
 import {
   VivoX200,
