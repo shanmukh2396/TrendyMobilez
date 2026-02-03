@@ -13,7 +13,7 @@ const Cart = () => {
     area: "",
     district: "",
     state: "",
-    country: "India", // default
+    country: "India",
     pincode: "",
   });
   const [formErrors, setFormErrors] = useState({});
@@ -23,7 +23,7 @@ const Cart = () => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Quantity handlers
+  // Quantity handlers (same as before)
   const increaseQuantity = (index) => {
     const updated = [...cartItems];
     updated[index].quantity = (updated[index].quantity || 1) + 1;
@@ -50,56 +50,62 @@ const Cart = () => {
     return sum + priceNum * qty;
   }, 0);
 
-  // Form validation
+  // Validate address form
   const validateAddress = () => {
     const errors = {};
-    if (!address.doorNo.trim()) errors.doorNo = "Door No is required";
-    if (!address.street.trim()) errors.street = "Street name is required";
-    if (!address.area.trim()) errors.area = "Area/Locality is required";
-    if (!address.district.trim()) errors.district = "District is required";
-    if (!address.state.trim()) errors.state = "State is required";
-    if (!address.country.trim()) errors.country = "Country is required";
+    if (!address.doorNo.trim()) errors.doorNo = "Required";
+    if (!address.street.trim()) errors.street = "Required";
+    if (!address.area.trim()) errors.area = "Required";
+    if (!address.district.trim()) errors.district = "Required";
+    if (!address.state.trim()) errors.state = "Required";
+    if (!address.country.trim()) errors.country = "Required";
     if (!address.pincode.trim()) {
-      errors.pincode = "Pincode is required";
+      errors.pincode = "Required";
     } else if (!/^\d{6}$/.test(address.pincode.trim())) {
-      errors.pincode = "Pincode must be 6 digits";
+      errors.pincode = "Must be 6 digits";
     }
-
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  // Handle form submit
-  const handleCheckoutSubmit = (e) => {
+  // Place order → save to orders + clear cart
+  const handlePlaceOrder = (e) => {
     e.preventDefault();
 
     if (!validateAddress()) {
-      alert("Please fill all required fields correctly");
+      alert("Please fill all required address fields correctly");
       return;
     }
 
-    // Simulate order placement
-    alert(
-      `Order placed successfully!\n\n` +
-      `Shipping Address:\n` +
-      `${address.doorNo}, ${address.street}\n` +
-      `${address.area}, ${address.district}\n` +
-      `${address.state}, ${address.country} - ${address.pincode}\n\n` +
-      `Total Amount: ₹${totalPrice.toLocaleString("en-IN")}`
-    );
+    // Get current orders or empty array
+    const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
 
-    // Clear cart after order (optional - comment out if you want to keep)
+    // Create new order object
+    const newOrder = {
+      id: Date.now(), // simple unique ID
+      items: cartItems.map(item => ({
+        brand: item.brand,
+        model: item.model,
+        price: item.price,
+        image: item.image,
+        quantity: item.quantity || 1,
+      })),
+      total: totalPrice,
+      address: { ...address },
+      date: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+      status: "Processing", // you can change this later (Pending, Shipped, Delivered...)
+    };
+
+    // Save to orders
+    localStorage.setItem("orders", JSON.stringify([...existingOrders, newOrder]));
+
+    // Clear cart
     setCartItems([]);
+    localStorage.removeItem("cart");
+
+    // Hide form and show success
     setShowCheckoutForm(false);
-    setAddress({
-      doorNo: "",
-      street: "",
-      area: "",
-      district: "",
-      state: "",
-      country: "India",
-      pincode: "",
-    });
+    alert("Order placed successfully! Check 'My Orders' page.");
   };
 
   return (
@@ -113,6 +119,7 @@ const Cart = () => {
         </div>
       ) : (
         <>
+          {/* Cart items list - same as before */}
           {cartItems.map((item, index) => {
             const quantity = item.quantity || 1;
             const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ""));
@@ -149,7 +156,6 @@ const Cart = () => {
                     {item.brand} {item.model}
                   </h3>
 
-                  {/* Price - big & bold */}
                   <div style={{ fontSize: "1.8rem", fontWeight: "bold", color: "#c0392b", margin: "0.6rem 0" }}>
                     ₹{(priceNum * quantity).toLocaleString("en-IN")}
                   </div>
@@ -221,7 +227,7 @@ const Cart = () => {
             );
           })}
 
-          {/* Total & Checkout */}
+          {/* Total & Checkout Button */}
           <div
             style={{
               marginTop: "2.5rem",
@@ -239,7 +245,7 @@ const Cart = () => {
             <button
               onClick={() => setShowCheckoutForm(true)}
               style={{
-                padding: "14px 32px",
+                padding: "14px 40px",
                 fontSize: "1.15rem",
                 background: "#27ae60",
                 color: "white",
@@ -372,6 +378,7 @@ const Cart = () => {
                   >
                     Place Order
                   </button>
+
                   <button
                     type="button"
                     onClick={() => setShowCheckoutForm(false)}
