@@ -2,14 +2,30 @@
 import React, { useState } from "react";
 
 const MyOrders = () => {
-  const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+  const [orders, setOrders] = useState(
+    JSON.parse(localStorage.getItem("orders") || "[]")
+  );
+
   const [expandedOrder, setExpandedOrder] = useState(null);
 
   const toggleExpand = (orderId) => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
-  // Simple dark mode detection (you can make this more sophisticated)
+  // Remove / Cancel order
+  const handleCancelOrder = (orderId) => {
+    if (!window.confirm("Are you sure you want to cancel/remove this order?")) {
+      return;
+    }
+
+    const updatedOrders = orders.filter((order) => order.id !== orderId);
+    setOrders(updatedOrders);
+    localStorage.setItem("orders", JSON.stringify(updatedOrders));
+
+    alert("Order has been removed/cancelled.");
+  };
+
+  // Simple dark mode detection
   const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   if (orders.length === 0) {
@@ -77,6 +93,7 @@ const MyOrders = () => {
       <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
         {orders.map((order) => {
           const isExpanded = expandedOrder === order.id;
+          const canCancel = order.status !== "Delivered" && order.status !== "Cancelled";
 
           return (
             <div
@@ -89,7 +106,6 @@ const MyOrders = () => {
                 boxShadow: isDarkMode
                   ? "0 10px 25px rgba(0,0,0,0.4)"
                   : "0 10px 25px rgba(0,0,0,0.08)",
-                transition: "all 0.2s ease",
               }}
             >
               {/* Order Header */}
@@ -122,10 +138,14 @@ const MyOrders = () => {
                       background:
                         order.status === "Delivered"
                           ? isDarkMode ? "#065f46" : "#d1fae5"
+                          : order.status === "Cancelled"
+                          ? isDarkMode ? "#7f1d1d" : "#fee2e2"
                           : isDarkMode ? "#92400e" : "#fef3c7",
                       color:
                         order.status === "Delivered"
                           ? isDarkMode ? "#d1fae5" : "#065f46"
+                          : order.status === "Cancelled"
+                          ? isDarkMode ? "#fecaca" : "#991b1b"
                           : isDarkMode ? "#fef3c7" : "#92400e",
                       borderRadius: "20px",
                       fontSize: "0.95rem",
@@ -283,8 +303,8 @@ const MyOrders = () => {
                     {order.address.state}, {order.address.country} - {order.address.pincode}
                   </div>
 
-                  {/* Download Invoice */}
-                  <div style={{ marginTop: "2rem", textAlign: "center" }}>
+                  {/* Action Buttons */}
+                  <div style={{ marginTop: "2rem", display: "flex", gap: "1rem", justifyContent: "center" }}>
                     <button
                       onClick={() => {
                         const invoiceText = `
@@ -302,11 +322,11 @@ ${order.address.doorNo}, ${order.address.street}
 ${order.address.area}, ${order.address.district}
 ${order.address.state}, ${order.address.country} - ${order.address.pincode}
                         `;
-                        alert("Invoice copied to clipboard!\n\n" + invoiceText);
                         navigator.clipboard.writeText(invoiceText);
+                        alert("Invoice copied to clipboard!\n\n" + invoiceText);
                       }}
                       style={{
-                        padding: "10px 28px",
+                        padding: "10px 24px",
                         background: isDarkMode ? "#4b5563" : "#6b7280",
                         color: "white",
                         border: "none",
@@ -315,8 +335,26 @@ ${order.address.state}, ${order.address.country} - ${order.address.pincode}
                         fontSize: "1rem",
                       }}
                     >
-                      Download Invoice (Copy)
+                      Copy Invoice
                     </button>
+
+                    {canCancel && (
+                      <button
+                        onClick={() => handleCancelOrder(order.id)}
+                        style={{
+                          padding: "10px 24px",
+                          background: "#ef4444",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          fontSize: "1rem",
+                          fontWeight: "500",
+                        }}
+                      >
+                        Cancel Order
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
