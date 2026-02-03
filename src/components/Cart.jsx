@@ -6,48 +6,110 @@ const Cart = () => {
     JSON.parse(localStorage.getItem("cart") || "[]")
   );
 
-  // Update localStorage whenever cart changes
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [address, setAddress] = useState({
+    doorNo: "",
+    street: "",
+    area: "",
+    district: "",
+    state: "",
+    country: "India", // default
+    pincode: "",
+  });
+  const [formErrors, setFormErrors] = useState({});
+
+  // Sync cart to localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Increase quantity
+  // Quantity handlers
   const increaseQuantity = (index) => {
-    const updatedCart = [...cartItems];
-    updatedCart[index].quantity = (updatedCart[index].quantity || 1) + 1;
-    setCartItems(updatedCart);
+    const updated = [...cartItems];
+    updated[index].quantity = (updated[index].quantity || 1) + 1;
+    setCartItems(updated);
   };
 
-  // Decrease quantity (minimum 1)
   const decreaseQuantity = (index) => {
-    const updatedCart = [...cartItems];
-    if (updatedCart[index].quantity > 1) {
-      updatedCart[index].quantity -= 1;
-      setCartItems(updatedCart);
+    const updated = [...cartItems];
+    if (updated[index].quantity > 1) {
+      updated[index].quantity -= 1;
+      setCartItems(updated);
     }
   };
 
-  // Remove item from cart
   const removeItem = (index) => {
-    const updatedCart = cartItems.filter((_, i) => i !== index);
-    setCartItems(updatedCart);
+    const updated = cartItems.filter((_, i) => i !== index);
+    setCartItems(updated);
   };
 
-  // Calculate total price
+  // Calculate total
   const totalPrice = cartItems.reduce((sum, item) => {
     const qty = item.quantity || 1;
-    const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, "")); // remove ₹ symbol
+    const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ""));
     return sum + priceNum * qty;
   }, 0);
 
+  // Form validation
+  const validateAddress = () => {
+    const errors = {};
+    if (!address.doorNo.trim()) errors.doorNo = "Door No is required";
+    if (!address.street.trim()) errors.street = "Street name is required";
+    if (!address.area.trim()) errors.area = "Area/Locality is required";
+    if (!address.district.trim()) errors.district = "District is required";
+    if (!address.state.trim()) errors.state = "State is required";
+    if (!address.country.trim()) errors.country = "Country is required";
+    if (!address.pincode.trim()) {
+      errors.pincode = "Pincode is required";
+    } else if (!/^\d{6}$/.test(address.pincode.trim())) {
+      errors.pincode = "Pincode must be 6 digits";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Handle form submit
+  const handleCheckoutSubmit = (e) => {
+    e.preventDefault();
+
+    if (!validateAddress()) {
+      alert("Please fill all required fields correctly");
+      return;
+    }
+
+    // Simulate order placement
+    alert(
+      `Order placed successfully!\n\n` +
+      `Shipping Address:\n` +
+      `${address.doorNo}, ${address.street}\n` +
+      `${address.area}, ${address.district}\n` +
+      `${address.state}, ${address.country} - ${address.pincode}\n\n` +
+      `Total Amount: ₹${totalPrice.toLocaleString("en-IN")}`
+    );
+
+    // Clear cart after order (optional - comment out if you want to keep)
+    setCartItems([]);
+    setShowCheckoutForm(false);
+    setAddress({
+      doorNo: "",
+      street: "",
+      area: "",
+      district: "",
+      state: "",
+      country: "India",
+      pincode: "",
+    });
+  };
+
   return (
-    <div style={{ padding: "2rem", maxWidth: "900px", margin: "0 auto" }}>
+    <div style={{ padding: "2rem", maxWidth: "1000px", margin: "0 auto" }}>
       <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>My Cart</h1>
 
       {cartItems.length === 0 ? (
-        <div style={{ textAlign: "center", fontSize: "1.2rem", color: "#666" }}>
+        <div style={{ textAlign: "center", fontSize: "1.3rem", color: "#555" }}>
           <p>Your cart is empty.</p>
-          <p>Start shopping now!</p>
+          <p>Start adding some amazing mobiles!</p>
         </div>
       ) : (
         <>
@@ -61,84 +123,90 @@ const Cart = () => {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  border: "1px solid #ddd",
-                  borderRadius: "10px",
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "12px",
                   padding: "1.2rem",
-                  marginBottom: "1.2rem",
-                  background: "#fff",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                  marginBottom: "1.5rem",
+                  background: "#ffffff",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
                 }}
               >
-                {/* Image */}
                 <img
                   src={item.image}
                   alt={item.model}
                   style={{
-                    width: "120px",
-                    height: "120px",
+                    width: "140px",
+                    height: "140px",
                     objectFit: "contain",
-                    marginRight: "1.5rem",
+                    marginRight: "1.8rem",
                     borderRadius: "8px",
+                    border: "1px solid #eee",
                   }}
                 />
 
-                {/* Details */}
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: "0 0 0.5rem 0" }}>
+                  <h3 style={{ margin: "0 0 0.6rem 0", fontSize: "1.4rem" }}>
                     {item.brand} {item.model}
                   </h3>
-                  <p style={{ margin: "0.3rem 0", fontSize: "1.4rem", fontWeight: "bold", color: "#e74c3c" }}>
-                    ₹{(priceNum * quantity).toLocaleString("en-IN")}
-                  </p>
 
-                  {/* Quantity Controls */}
+                  {/* Price - big & bold */}
+                  <div style={{ fontSize: "1.8rem", fontWeight: "bold", color: "#c0392b", margin: "0.6rem 0" }}>
+                    ₹{(priceNum * quantity).toLocaleString("en-IN")}
+                  </div>
+
+                  {/* Quantity controls */}
                   <div style={{ display: "flex", alignItems: "center", margin: "1rem 0" }}>
                     <button
                       onClick={() => decreaseQuantity(index)}
                       disabled={quantity <= 1}
                       style={{
-                        padding: "8px 14px",
-                        fontSize: "1.1rem",
-                        background: quantity <= 1 ? "#eee" : "#3498db",
+                        padding: "8px 16px",
+                        fontSize: "1.2rem",
+                        background: quantity <= 1 ? "#f0f0f0" : "#3498db",
                         color: "white",
                         border: "none",
                         borderRadius: "6px 0 0 6px",
                         cursor: quantity <= 1 ? "not-allowed" : "pointer",
+                        minWidth: "50px",
                       }}
                     >
                       -
                     </button>
+
                     <span
                       style={{
-                        padding: "8px 16px",
-                        fontSize: "1.1rem",
+                        padding: "8px 20px",
+                        fontSize: "1.2rem",
                         borderTop: "1px solid #ddd",
                         borderBottom: "1px solid #ddd",
+                        minWidth: "60px",
+                        textAlign: "center",
                       }}
                     >
                       {quantity}
                     </span>
+
                     <button
                       onClick={() => increaseQuantity(index)}
                       style={{
-                        padding: "8px 14px",
-                        fontSize: "1.1rem",
+                        padding: "8px 16px",
+                        fontSize: "1.2rem",
                         background: "#3498db",
                         color: "white",
                         border: "none",
                         borderRadius: "0 6px 6px 0",
                         cursor: "pointer",
+                        minWidth: "50px",
                       }}
                     >
                       +
                     </button>
                   </div>
 
-                  {/* Remove Button */}
                   <button
                     onClick={() => removeItem(index)}
                     style={{
-                      padding: "6px 14px",
+                      padding: "8px 16px",
                       background: "#e74c3c",
                       color: "white",
                       border: "none",
@@ -153,33 +221,177 @@ const Cart = () => {
             );
           })}
 
-          {/* Total Section */}
+          {/* Total & Checkout */}
           <div
             style={{
-              marginTop: "2rem",
-              padding: "1.5rem",
+              marginTop: "2.5rem",
+              padding: "1.8rem",
               background: "#f8f9fa",
-              borderRadius: "10px",
+              borderRadius: "12px",
               textAlign: "right",
+              border: "1px solid #e0e0e0",
             }}
           >
-            <h2 style={{ margin: "0 0 0.8rem 0" }}>
-              Total: ₹{totalPrice.toLocaleString("en-IN")}
+            <h2 style={{ margin: "0 0 1rem 0", fontSize: "1.8rem" }}>
+              Total Amount: ₹{totalPrice.toLocaleString("en-IN")}
             </h2>
+
             <button
+              onClick={() => setShowCheckoutForm(true)}
               style={{
-                padding: "12px 28px",
-                fontSize: "1.1rem",
+                padding: "14px 32px",
+                fontSize: "1.15rem",
                 background: "#27ae60",
                 color: "white",
                 border: "none",
                 borderRadius: "8px",
                 cursor: "pointer",
+                fontWeight: "bold",
               }}
             >
               Proceed to Checkout
             </button>
           </div>
+
+          {/* Shipping Address Form */}
+          {showCheckoutForm && (
+            <div
+              style={{
+                marginTop: "2.5rem",
+                padding: "2rem",
+                background: "#fff",
+                borderRadius: "12px",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+              }}
+            >
+              <h2 style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+                Shipping Address
+              </h2>
+
+              <form onSubmit={handleCheckoutSubmit}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.2rem" }}>
+                  <div>
+                    <label>Door No / Flat No *</label>
+                    <input
+                      type="text"
+                      value={address.doorNo}
+                      onChange={(e) => setAddress({ ...address, doorNo: e.target.value })}
+                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      required
+                    />
+                    {formErrors.doorNo && <small style={{ color: "red" }}>{formErrors.doorNo}</small>}
+                  </div>
+
+                  <div>
+                    <label>Street Name / Road *</label>
+                    <input
+                      type="text"
+                      value={address.street}
+                      onChange={(e) => setAddress({ ...address, street: e.target.value })}
+                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      required
+                    />
+                    {formErrors.street && <small style={{ color: "red" }}>{formErrors.street}</small>}
+                  </div>
+
+                  <div>
+                    <label>Area / Locality / Village *</label>
+                    <input
+                      type="text"
+                      value={address.area}
+                      onChange={(e) => setAddress({ ...address, area: e.target.value })}
+                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      required
+                    />
+                    {formErrors.area && <small style={{ color: "red" }}>{formErrors.area}</small>}
+                  </div>
+
+                  <div>
+                    <label>District *</label>
+                    <input
+                      type="text"
+                      value={address.district}
+                      onChange={(e) => setAddress({ ...address, district: e.target.value })}
+                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      required
+                    />
+                    {formErrors.district && <small style={{ color: "red" }}>{formErrors.district}</small>}
+                  </div>
+
+                  <div>
+                    <label>State *</label>
+                    <input
+                      type="text"
+                      value={address.state}
+                      onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      required
+                    />
+                    {formErrors.state && <small style={{ color: "red" }}>{formErrors.state}</small>}
+                  </div>
+
+                  <div>
+                    <label>Country *</label>
+                    <input
+                      type="text"
+                      value={address.country}
+                      onChange={(e) => setAddress({ ...address, country: e.target.value })}
+                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      required
+                    />
+                    {formErrors.country && <small style={{ color: "red" }}>{formErrors.country}</small>}
+                  </div>
+
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <label>Pincode *</label>
+                    <input
+                      type="text"
+                      value={address.pincode}
+                      onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
+                      maxLength={6}
+                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      required
+                    />
+                    {formErrors.pincode && <small style={{ color: "red" }}>{formErrors.pincode}</small>}
+                  </div>
+                </div>
+
+                <div style={{ marginTop: "2rem", textAlign: "center" }}>
+                  <button
+                    type="submit"
+                    style={{
+                      padding: "14px 40px",
+                      fontSize: "1.1rem",
+                      background: "#e67e22",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Place Order
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCheckoutForm(false)}
+                    style={{
+                      padding: "14px 40px",
+                      fontSize: "1.1rem",
+                      background: "#95a5a6",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      marginLeft: "1rem",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
         </>
       )}
     </div>
