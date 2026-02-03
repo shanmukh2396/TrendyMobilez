@@ -1,5 +1,5 @@
 // src/App.jsx
-import { ProtectedRoute, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Carousel from "./components/Carousel";
 import Card from "./components/Card"; // your product list page
@@ -64,25 +64,19 @@ function App() {
           <Route
                   path="/profile"
                   element={
-                    <ProtectedRoute>
                       <Profile />
-                    </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/cart"
                   element={
-                    <ProtectedRoute>
                       <Cart />
-                    </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/orders"
                   element={
-                    <ProtectedRoute>
                       <MyOrders />
-                    </ProtectedRoute>
                   }
                 />
           
