@@ -1,5 +1,6 @@
 // src/components/Cart.jsx
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState(
@@ -18,7 +19,7 @@ const Cart = () => {
   });
   const [formErrors, setFormErrors] = useState({});
 
-  // Sync cart to localStorage whenever it changes
+  // Sync cart changes to localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
@@ -39,7 +40,7 @@ const Cart = () => {
     }
   };
 
-  // Remove item
+  // Remove item from cart
   const removeItem = (index) => {
     const updatedCart = cartItems.filter((_, i) => i !== index);
     setCartItems(updatedCart);
@@ -70,7 +71,7 @@ const Cart = () => {
     return Object.keys(errors).length === 0;
   };
 
-  // Handle form submission (Place Order)
+  // Handle placing the order
   const handlePlaceOrder = (e) => {
     e.preventDefault();
 
@@ -114,20 +115,79 @@ const Cart = () => {
       pincode: "",
     });
 
-    alert("Order placed successfully! Check 'My Orders' page.");
+    alert("Order placed successfully! You can view it in 'My Orders'.");
   };
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "1000px", margin: "0 auto" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>My Cart</h1>
+    <div style={{ padding: "3rem 2rem", maxWidth: "1100px", margin: "0 auto" }}>
+      <h1 style={{ textAlign: "center", marginBottom: "3rem", fontSize: "2.5rem", color: "#1e293b" }}>
+        My Shopping Cart
+      </h1>
 
       {cartItems.length === 0 ? (
-        <div style={{ textAlign: "center", fontSize: "1.3rem", color: "#555" }}>
-          <p>Your cart is empty.</p>
-          <p>Start adding some amazing mobiles!</p>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "5rem 1rem",
+            background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+            borderRadius: "20px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+            border: "1px solid #e2e8f0",
+          }}
+        >
+          {/* Big empty cart icon */}
+          <div style={{ fontSize: "8rem", color: "#94a3b8", marginBottom: "1.5rem" }}>
+            <i className="fas fa-shopping-cart"></i>
+          </div>
+
+          <h2 style={{ fontSize: "2rem", color: "#1e293b", marginBottom: "1rem" }}>
+            Your cart is empty
+          </h2>
+
+          <p style={{
+            fontSize: "1.2rem",
+            color: "#64748b",
+            maxWidth: "600px",
+            margin: "0 auto 2.5rem",
+            lineHeight: 1.6,
+          }}>
+            Looks like you haven't added any products yet.<br />
+            Explore our latest collection of Vivo, Oppo, iQOO, Samsung & Realme smartphones!
+          </p>
+
+          <Link
+            to="/"
+            style={{
+              display: "inline-block",
+              padding: "16px 48px",
+              background: "#3b82f6",
+              color: "white",
+              fontSize: "1.2rem",
+              fontWeight: "600",
+              borderRadius: "12px",
+              textDecoration: "none",
+              boxShadow: "0 4px 12px rgba(59,130,246,0.3)",
+              transition: "all 0.3s ease",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = "#2563eb";
+              e.currentTarget.style.transform = "translateY(-3px)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = "#3b82f6";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Start Shopping Now →
+          </Link>
+
+          <p style={{ marginTop: "2.5rem", fontSize: "1rem", color: "#94a3b8" }}>
+            Popular brands: Vivo • Oppo • iQOO • Samsung • Realme
+          </p>
         </div>
       ) : (
         <>
+          {/* Cart Items */}
           {cartItems.map((item, index) => {
             const quantity = item.quantity || 1;
             const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ""));
@@ -138,12 +198,12 @@ const Cart = () => {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  border: "1px solid #e0e0e0",
+                  border: "1px solid #e2e8f0",
                   borderRadius: "12px",
-                  padding: "1.2rem",
+                  padding: "1.5rem",
                   marginBottom: "1.5rem",
                   background: "#ffffff",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                 }}
               >
                 <img
@@ -153,20 +213,20 @@ const Cart = () => {
                     width: "140px",
                     height: "140px",
                     objectFit: "contain",
-                    marginRight: "1.8rem",
-                    borderRadius: "8px",
-                    border: "1px solid #eee",
+                    marginRight: "2rem",
+                    borderRadius: "10px",
+                    border: "1px solid #e5e7eb",
                   }}
                 />
 
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: "0 0 0.6rem 0", fontSize: "1.4rem" }}>
+                  <h3 style={{ margin: "0 0 0.6rem 0", fontSize: "1.5rem" }}>
                     {item.brand} {item.model}
                   </h3>
 
                   <div
                     style={{
-                      fontSize: "2rem",
+                      fontSize: "2.1rem",
                       fontWeight: "bold",
                       color: "#c0392b",
                       margin: "0.8rem 0",
@@ -175,31 +235,33 @@ const Cart = () => {
                     ₹{(priceNum * quantity).toLocaleString("en-IN")}
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", margin: "1rem 0" }}>
+                  <div style={{ display: "flex", alignItems: "center", margin: "1.2rem 0" }}>
                     <button
                       onClick={() => decreaseQuantity(index)}
                       disabled={quantity <= 1}
                       style={{
-                        padding: "10px 16px",
-                        fontSize: "1.3rem",
-                        background: quantity <= 1 ? "#f0f0f0" : "#3498db",
+                        padding: "10px 18px",
+                        fontSize: "1.4rem",
+                        background: quantity <= 1 ? "#e2e8f0" : "#3b82f6",
                         color: "white",
                         border: "none",
-                        borderRadius: "6px 0 0 6px",
+                        borderRadius: "8px 0 0 8px",
                         cursor: quantity <= 1 ? "not-allowed" : "pointer",
+                        minWidth: "60px",
                       }}
                     >
-                      -
+                      −
                     </button>
 
                     <span
                       style={{
-                        padding: "10px 20px",
-                        fontSize: "1.3rem",
-                        borderTop: "1px solid #ddd",
-                        borderBottom: "1px solid #ddd",
-                        minWidth: "60px",
+                        padding: "10px 24px",
+                        fontSize: "1.4rem",
+                        borderTop: "1px solid #e2e8f0",
+                        borderBottom: "1px solid #e2e8f0",
+                        minWidth: "70px",
                         textAlign: "center",
+                        background: "#fff",
                       }}
                     >
                       {quantity}
@@ -208,13 +270,14 @@ const Cart = () => {
                     <button
                       onClick={() => increaseQuantity(index)}
                       style={{
-                        padding: "10px 16px",
-                        fontSize: "1.3rem",
-                        background: "#3498db",
+                        padding: "10px 18px",
+                        fontSize: "1.4rem",
+                        background: "#3b82f6",
                         color: "white",
                         border: "none",
-                        borderRadius: "0 6px 6px 0",
+                        borderRadius: "0 8px 8px 0",
                         cursor: "pointer",
+                        minWidth: "60px",
                       }}
                     >
                       +
@@ -224,15 +287,16 @@ const Cart = () => {
                   <button
                     onClick={() => removeItem(index)}
                     style={{
-                      padding: "8px 16px",
-                      background: "#e74c3c",
+                      padding: "10px 20px",
+                      background: "#ef4444",
                       color: "white",
                       border: "none",
-                      borderRadius: "6px",
+                      borderRadius: "8px",
                       cursor: "pointer",
+                      fontSize: "1rem",
                     }}
                   >
-                    Remove
+                    Remove Item
                   </button>
                 </div>
               </div>
@@ -242,150 +306,165 @@ const Cart = () => {
           {/* Total & Checkout */}
           <div
             style={{
-              marginTop: "2.5rem",
-              padding: "1.8rem",
-              background: "#f8f9fa",
+              marginTop: "3rem",
+              padding: "2rem",
+              background: "#f8fafc",
               borderRadius: "12px",
+              border: "1px solid #e2e8f0",
               textAlign: "right",
-              border: "1px solid #e0e0e0",
             }}
           >
-            <h2 style={{ margin: "0 0 1rem 0", fontSize: "2rem" }}>
+            <h2 style={{ margin: "0 0 1.2rem 0", fontSize: "2.2rem", color: "#1e293b" }}>
               Total Amount: ₹{totalPrice.toLocaleString("en-IN")}
             </h2>
 
             <button
               onClick={() => setShowCheckoutForm(true)}
               style={{
-                padding: "14px 40px",
-                fontSize: "1.2rem",
-                background: "#27ae60",
+                padding: "16px 48px",
+                fontSize: "1.25rem",
+                background: "#10b981",
                 color: "white",
                 border: "none",
-                borderRadius: "8px",
+                borderRadius: "10px",
                 cursor: "pointer",
-                fontWeight: "bold",
+                fontWeight: "600",
+                boxShadow: "0 4px 12px rgba(16,185,129,0.3)",
               }}
             >
               Proceed to Checkout
             </button>
           </div>
 
-          {/* Checkout Form */}
+          {/* Shipping Address Form */}
           {showCheckoutForm && (
             <div
               style={{
-                marginTop: "2.5rem",
-                padding: "2rem",
-                background: "#fff",
-                borderRadius: "12px",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                marginTop: "3rem",
+                padding: "2.5rem",
+                background: "#ffffff",
+                borderRadius: "16px",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
               }}
             >
-              <h2 style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+              <h2 style={{ textAlign: "center", marginBottom: "2rem", fontSize: "2rem" }}>
                 Shipping Address
               </h2>
 
               <form onSubmit={handlePlaceOrder}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.2rem" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.4rem" }}>
                   <div>
-                    <label>Door No / Flat No *</label>
+                    <label style={{ fontWeight: "600", display: "block", marginBottom: "0.6rem" }}>
+                      Door No / Flat No *
+                    </label>
                     <input
                       type="text"
                       value={address.doorNo}
                       onChange={(e) => setAddress({ ...address, doorNo: e.target.value })}
-                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
                       required
                     />
                     {formErrors.doorNo && <small style={{ color: "red" }}>{formErrors.doorNo}</small>}
                   </div>
 
                   <div>
-                    <label>Street Name / Road *</label>
+                    <label style={{ fontWeight: "600", display: "block", marginBottom: "0.6rem" }}>
+                      Street Name / Road *
+                    </label>
                     <input
                       type="text"
                       value={address.street}
                       onChange={(e) => setAddress({ ...address, street: e.target.value })}
-                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
                       required
                     />
                     {formErrors.street && <small style={{ color: "red" }}>{formErrors.street}</small>}
                   </div>
 
                   <div>
-                    <label>Area / Locality / Village *</label>
+                    <label style={{ fontWeight: "600", display: "block", marginBottom: "0.6rem" }}>
+                      Area / Locality / Village *
+                    </label>
                     <input
                       type="text"
                       value={address.area}
                       onChange={(e) => setAddress({ ...address, area: e.target.value })}
-                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
                       required
                     />
                     {formErrors.area && <small style={{ color: "red" }}>{formErrors.area}</small>}
                   </div>
 
                   <div>
-                    <label>District *</label>
+                    <label style={{ fontWeight: "600", display: "block", marginBottom: "0.6rem" }}>
+                      District *
+                    </label>
                     <input
                       type="text"
                       value={address.district}
                       onChange={(e) => setAddress({ ...address, district: e.target.value })}
-                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
                       required
                     />
                     {formErrors.district && <small style={{ color: "red" }}>{formErrors.district}</small>}
                   </div>
 
                   <div>
-                    <label>State *</label>
+                    <label style={{ fontWeight: "600", display: "block", marginBottom: "0.6rem" }}>
+                      State *
+                    </label>
                     <input
                       type="text"
                       value={address.state}
                       onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
                       required
                     />
                     {formErrors.state && <small style={{ color: "red" }}>{formErrors.state}</small>}
                   </div>
 
                   <div>
-                    <label>Country *</label>
+                    <label style={{ fontWeight: "600", display: "block", marginBottom: "0.6rem" }}>
+                      Country *
+                    </label>
                     <input
                       type="text"
                       value={address.country}
                       onChange={(e) => setAddress({ ...address, country: e.target.value })}
-                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
                       required
                     />
                     {formErrors.country && <small style={{ color: "red" }}>{formErrors.country}</small>}
                   </div>
 
                   <div style={{ gridColumn: "1 / -1" }}>
-                    <label>Pincode *</label>
+                    <label style={{ fontWeight: "600", display: "block", marginBottom: "0.6rem" }}>
+                      Pincode *
+                    </label>
                     <input
                       type="text"
                       value={address.pincode}
                       onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
                       maxLength={6}
-                      style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
                       required
                     />
                     {formErrors.pincode && <small style={{ color: "red" }}>{formErrors.pincode}</small>}
                   </div>
                 </div>
 
-                <div style={{ marginTop: "2rem", textAlign: "center" }}>
+                <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
                   <button
                     type="submit"
                     style={{
-                      padding: "14px 40px",
-                      fontSize: "1.1rem",
+                      padding: "16px 48px",
+                      fontSize: "1.2rem",
                       background: "#e67e22",
                       color: "white",
                       border: "none",
-                      borderRadius: "8px",
+                      borderRadius: "10px",
                       cursor: "pointer",
-                      fontWeight: "bold",
+                      fontWeight: "600",
                     }}
                   >
                     Place Order
@@ -395,13 +474,13 @@ const Cart = () => {
                     type="button"
                     onClick={() => setShowCheckoutForm(false)}
                     style={{
-                      padding: "14px 40px",
-                      fontSize: "1.1rem",
-                      background: "#95a5a6",
+                      padding: "16px 48px",
+                      fontSize: "1.2rem",
+                      background: "#6b7280",
                       color: "white",
                       border: "none",
-                      borderRadius: "8px",
-                      marginLeft: "1rem",
+                      borderRadius: "10px",
+                      marginLeft: "1.5rem",
                       cursor: "pointer",
                     }}
                   >
